@@ -1,6 +1,6 @@
 # ⛏️ Seismic Sentinel: early warning of rock bursts in coal mines
 
-> 🚧 Work in progress. The Streamlit app is coming in a later commit.
+> 🚧 Work in progress. A basic Streamlit app is in place; the custom UI is coming next.
 
 ## Problem statement
 Deep underground, the rock around a longwall coal face stores stress until it suddenly releases it as a **seismic bump**, or rock burst. A bump above 10⁴ J can collapse workings and kill miners. Mines record seismic and acoustic activity on every 8-hour shift, but the hazard-assessment methods used today miss many of these events.
@@ -51,4 +51,5 @@ All five models are trained on the same split. Logistic Regression, Decision Tre
 ```bash
 pip install -r requirements.txt
 python model/train.py      # trains 5 models -> model/*.joblib, model/metrics.json
+streamlit run app.py
 ```
