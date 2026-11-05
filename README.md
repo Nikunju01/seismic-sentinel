@@ -1,6 +1,6 @@
 # ⛏️ Seismic Sentinel: early warning of rock bursts in coal mines
 
-> 🚧 Work in progress. A basic Streamlit app is in place; the custom UI is coming next.
+> 🚧 Work in progress. Custom control-room UI added; the model comparison view is coming next.
 
 ## Problem statement
 Deep underground, the rock around a longwall coal face stores stress until it suddenly releases it as a **seismic bump**, or rock burst. A bump above 10⁴ J can collapse workings and kill miners. Mines record seismic and acoustic activity on every 8-hour shift, but the hazard-assessment methods used today miss many of these events.
