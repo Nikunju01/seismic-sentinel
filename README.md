@@ -1,6 +1,6 @@
 # ⛏️ Seismic Sentinel: early warning of rock bursts in coal mines
 
-> 🚧 Work in progress. Custom control-room UI added; the model comparison view is coming next.
+**Live app:** `<paste Streamlit Cloud URL>` · **Repo:** https://github.com/Nikunju01/seismic-sentinel
 
 ## Problem statement
 Deep underground, the rock around a longwall coal face stores stress until it suddenly releases it as a **seismic bump**, or rock burst. A bump above 10⁴ J can collapse workings and kill miners. Mines record seismic and acoustic activity on every 8-hour shift, but the hazard-assessment methods used today miss many of these events.
@@ -47,9 +47,31 @@ All five models are trained on the same split. Logistic Regression, Decision Tre
 
 **Overall winner for this dataset: Support Vector Machine.** On a 6.6%-positive problem, accuracy is misleading, because always predicting "calm" scores 93.4%. MCC and F1 are the fair measures, and SVM leads on both. Logistic Regression is the runner-up with the best AUC. The low absolute scores across all models match the published literature for this dataset: bumps are hard to forecast from one shift of monitoring data.
 
+## Streamlit app
+The app is a dark "mine control-room" console, built with custom CSS, an animated seismograph header and Plotly charts:
+1. **Feed the sensors:** upload a test CSV (a sample `test_data.csv` can be downloaded inside the app).
+2. **Detector readout:** pick one of the 5 saved models from the dropdown to see the 6 metric dials, a confusion matrix written in mining terms (caught / missed / false alarm), a classification report, and a "risk seismogram" of predicted probabilities with the real hazards marked.
+3. **Detector shoot-out:** all 5 models scored on the uploaded data, shown as a leaderboard and a radar chart. The best model by MCC is highlighted.
+
+Models are loaded from `model/*.joblib`. The app never retrains on uploaded data.
+
+## Project structure
+```
+├── app.py                 # Streamlit app
+├── requirements.txt
+├── README.md
+├── test_data.csv          # held-out 25% split, used for the app
+├── raw/seismic-bumps.arff # original UCI data
+├── .streamlit/config.toml # theme
+└── model/
+    ├── train.py           # preprocessing + training + evaluation
+    ├── metrics.json
+    └── *.joblib           # 5 trained pipelines
+```
+
 ## Run locally
 ```bash
 pip install -r requirements.txt
-python model/train.py      # trains 5 models -> model/*.joblib, model/metrics.json
+python model/train.py      # retrain (optional, models already saved)
 streamlit run app.py
 ```

@@ -1,4 +1,5 @@
 """Seismic Sentinel - a control-room console that scores saved models on uploaded coal-mine shift logs."""
+import json
 from pathlib import Path
 
 import joblib
@@ -173,4 +174,33 @@ with right:
                       yaxis_title="P(hazard)", legend=dict(orientation="h", y=-0.3))
     st.plotly_chart(plot_base(fig), width='stretch')
 
+# ---------- 03 · All detectors ----------
+st.markdown('<div class="sec">03 · DETECTOR SHOOT-OUT<small>all five saved models on your uploaded shifts</small></div>',
+            unsafe_allow_html=True)
+board = {}
+for name, slug in MODELS.items():
+    p = load_model(slug)
+    board[name] = score(y, p.predict(X), p.predict_proba(X)[:, 1])
+board = pd.DataFrame(board).T
+best = board["MCC"].idxmax()
+
+b1, b2 = st.columns([1.3, 1], gap="large")
+with b1:
+    st.dataframe(board.style.format("{:.4f}").highlight_max(color="#5A4300"), width='stretch')
+    st.markdown(f'<div class="verdict">🏆 Best balance on this log (by MCC): <b style="color:{AMBER}">{best}</b>. '
+                f'Accuracy alone misleads here: a model that always says "calm" would score '
+                f'{1 - hazards / len(df):.1%}.</div>', unsafe_allow_html=True)
+with b2:
+    axes = list(board.columns)
+    fig = go.Figure()
+    for i, (name, row) in enumerate(board.iterrows()):
+        fig.add_trace(go.Scatterpolar(r=list(row.clip(lower=0)) + [max(row.iloc[0], 0)], theta=axes + [axes[0]],
+                                      name=name, line=dict(width=3 if name == best else 1)))
+    fig.update_layout(polar=dict(bgcolor="#15171A", radialaxis=dict(range=[0, 1], gridcolor="#2A2D31"),
+                                 angularaxis=dict(gridcolor="#2A2D31")), legend=dict(orientation="h", y=-0.15))
+    st.plotly_chart(plot_base(fig, 380), width='stretch')
+
+with st.expander("Training-time metrics (held-out 25% split, from model/metrics.json)"):
+    st.dataframe(pd.DataFrame(json.loads((MODEL_DIR / "metrics.json").read_text())).T.style.format("{:.4f}"),
+                 width='stretch')
 st.markdown('<div class="stripe" style="margin-top:30px"></div>', unsafe_allow_html=True)
